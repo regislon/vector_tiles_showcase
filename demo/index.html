@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Spatial Signatures in Great Britain</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- load leaflet.js -->
+    <!-- load CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <!-- load JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <!-- load VectorGrid extension -->
+    <script src="https://unpkg.com/leaflet.vectorgrid@1.3.0/dist/Leaflet.VectorGrid.bundled.js"></script>
+</head>
+
+<body style='margin:0'>
+    <!-- div containing map -->
+    <div id="map" style="width: 100vw; height: 100vh; background: #fdfdfd"></div>
+    <!-- specification of leaflet map -->
+    <script>
+        // create map
+        var map = L.map('map', {
+            center: [47, 7],
+            minZoom: 6,
+            maxZoom: 15,
+            zoomControl: true,
+            zoom: 12,
+        });
+
+        // add background basemap
+        var mapBaseLayer = L.tileLayer(
+            'https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png', {
+                attribution: '(C) OpenStreetMap contributors (C) CARTO'
+            }
+        ).addTo(map);
+
+        // get vector tiles URL
+        var mapUrl = "http://localhost:3000/admin/{z}/{x}/{y}";
+
+
+        // define styling of vector tiles
+        var vectorTileStyling = {
+            signatures_4326: function(properties) {
+                return ({
+                    fill: true,
+                    fillOpacity: 0.9,
+                    weight: 1,
+                    color: "#ffffff",
+                    opacity: 1.0,
+                });
+            }
+        }
+
+        // define options of vector tiles
+        var mapVectorTileOptions = {
+            rendererFactory: L.canvas.tile,
+            interactive: true,
+            maxNativeZoom: 15,
+            minZoom: 6,
+            vectorTileLayerStyles: vectorTileStyling,
+        };
+
+        // create VectorGrid layer
+        var mapPbfLayer = new L.VectorGrid.Protobuf(
+            mapUrl, mapVectorTileOptions
+        )
+
+        // add VectorGrid layer to map
+        mapPbfLayer.addTo(map);
+    </script>
+</body>
+
+</html>
